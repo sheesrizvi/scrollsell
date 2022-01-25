@@ -53,8 +53,9 @@ export default function CameraScreen() {
     if (cameraRef) {
       try {
         const options = {
-          maxDuration: 30,
-          quality: Camera.Constants.VideoQuality["480"],
+          maxDuration: 20,
+          quality: Camera.Constants.VideoQuality["480p"],
+          // VideoQuality: ["480p"],
         };
         const videoRecordPromise = cameraRef.recordAsync(options);
         const type = `video/${options.quality}`;
@@ -62,25 +63,9 @@ export default function CameraScreen() {
         const data = await videoRecordPromise;
         const source = data.uri;
 
-        // const result = new FormData();
-        // result.append("video", {
-        //   name: "mobile-video-upload",
-        //   type,
-        //   source,
-        // });
-
-        // try {
-        //   await fetch("/api/upload", {
-        //     method: "post",
-        //     body: result,
-        //   });
-        // } catch (e) {
-        //   console.error(e);
-        // }
-
         if (videoRecordPromise) {
           let sourceThumb = await generateThumbnail(source);
-          navigation.navigate("savePost", { source, sourceThumb });
+          navigation.navigate("ListingEdit", { source, sourceThumb });
         }
       } catch (error) {
         console.warn(error);

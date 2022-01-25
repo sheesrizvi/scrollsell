@@ -10,13 +10,12 @@ const s3 = new aws.S3({
   region: process.env.AWS_BUCKET_REGION,
 });
 
-console.log(s3);
+// console.log(s3)
 
 const upload = multer({
   storage: multerS3({
     s3,
-    bucket: "scrollsell",
-    contentType: multerS3.AUTO_CONTENT_TYPE,
+    bucket: 'scrollsell',
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
     },
@@ -26,13 +25,15 @@ const upload = multer({
   }),
 });
 
+// console.log(upload);
+
 router.post("/", upload.single("video"), (req, res) => {
-  // res.send(`/${req.files}`)
-  // console.log(req.files);
-  res.send({
-    data: req.files,
-    msg: "sucessfully upload" + req.files + " files!",
-  });
+  res.send(`${req.file.location}`)
+  console.log(req.file.location);
+  // res.send({
+  //   data: req.files,
+  //   msg: "sucessfully upload" + req.files + " files!",
+  // });
 });
 
 module.exports = router;

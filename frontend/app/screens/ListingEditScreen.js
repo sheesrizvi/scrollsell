@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Image } from "react-native";
 import * as Yup from "yup";
+import client from "../api/client"
 import AppFormPicker from "../components/AppFormPicker";
 import CategoryPickerItem from "../components/CategoryPickerItem";
 import { AppFormField, SubmitButton, AppForm } from "../components/forms";
@@ -20,60 +21,76 @@ const validationSchema = Yup.object().shape({
   images: Yup.array().min(1, "Please select at least one image"),
 });
 
-// const categories = [
-//   {
-//     label: "Furniture",
-//     value: 1,
-//     backgroundColor: "#fc5c65",
-//     icon: "floor-lamp",
-//   },
-//   { label: "Clothing", value: 2, backgroundColor: "green", icon: "email" },
-//   { label: "Cameras", value: 3, backgroundColor: "blue", icon: "camera" },
-//   { label: "Cars", value: 4, backgroundColor: "#fd9644", icon: "car" },
-// ];
-
-function ListingEditScreen(props) {
+function ListingEditScreen({ route }) {
   const location = useLocation();
   const [uploadVisible, setUploadVisible] = useState(false);
   const [progress, setProgress] = useState(0);
-  const getCategoriesApi = useApi(categoriesApi.getCategories)
+  const [video, setVideo] = useState("");
+  const getCategoriesApi = useApi(categoriesApi.getCategories);
 
   useEffect(() => {
     getCategoriesApi.request();
-    
   }, []);
 
   const handleSubmit = async (listing, { resetForm }) => {
-    setProgress(0);
-    setUploadVisible(true);
-    const result = await listingsApi.addListing(
-      { ...listing, location },
-      (progress) => setProgress(progress)
-    );
+    const source = route.params.source;
 
-    if (!result.ok) {
-      setUploadVisible(false);
-      return alert("Could not save the listing");
+    const result = new FormData();
+    result.append("video", {
+      name: "video",
+      type: "video/mp4",
+      uri: source,
+    });
+
+    try {
+      
+      const { data } = await client.post("/upload", result);
+      console.log(listing);
+      setVideo(data);
+      console.log(data);
+      // navigation.navigate("Listings", {});
+      // console.log(res);
+      setProgress(0);
+      setUploadVisible(true);
+      const formResult = await listingsApi.addListing(
+        { ...listing, location, data },
+        (progress) => setProgress(progress)
+      );
+
+      if (!formResult.ok) {
+        setUploadVisible(false);
+        return alert("Could not save the listing");
+      }
+
+      resetForm();
+    } catch (e) {
+      console.error(e);
     }
-
-    resetForm();
   };
- 
+
   return (
     <Screen style={styles.container}>
-      <UploadScreen onDone={() => setUploadVisible(false)} progress={progress} visible={uploadVisible} />
+      <UploadScreen
+        onDone={() => setUploadVisible(false)}
+        progress={progress}
+        visible={uploadVisible}
+      />
       <AppForm
         initialValues={{
           title: "",
           price: "",
           description: "",
           category: null,
-          images: [],
+          video: "",
         }}
         onSubmit={handleSubmit}
         validationSchema={validationSchema}
       >
-        <AppFormImagePicker name="images" />
+        {/* <AppFormImagePicker name="images" /> */}
+        <Image
+          source={{ uri: route.params.source }}
+          style={styles.mediaPreview}
+        />
         <AppFormField maxLength={255} name="title" placeholder="Title" />
         <AppFormField
           keyboardType="numeric"
@@ -110,6 +127,67 @@ const styles = StyleSheet.create({
   SubmitButton: {
     marginLeft: 40,
     marginTop: 40,
+  },
+  uploadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  spacer: {
+    flex: 1,
+  },
+  formContainer: {
+    margin: 20,
+    flexDirection: "row",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    margin: 20,
+  },
+  inputText: {
+    paddingVertical: 10,
+    marginRight: 20,
+    flex: 1,
+  },
+  mediaPreview: {
+    aspectRatio: 9 / 16,
+    backgroundColor: "black",
+    width: 60,
+  },
+  cancelButton: {
+    alignItems: "center",
+    flex: 1,
+    borderColor: "lightgray",
+    borderWidth: 1,
+    flexDirection: "row",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: "center",
+    borderRadius: 4,
+    marginRight: 10,
+  },
+  postButton: {
+    alignItems: "center",
+    flex: 1,
+    backgroundColor: "#ff4040",
+    flexDirection: "row",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: "center",
+    borderRadius: 4,
+    marginRight: 10,
+  },
+  cancelButtonText: {
+    marginLeft: 5,
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  postButtonText: {
+    marginLeft: 5,
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 

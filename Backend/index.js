@@ -1,5 +1,5 @@
 const express = require("express");
-const dotenv = require('dotenv')
+const dotenv = require('dotenv').config()
 const connectDB = require('./db.js')
 const categories = require("./routes/categories");
 const listings = require("./routes/listings");
@@ -15,7 +15,7 @@ const helmet = require("helmet");
 const compression = require("compression");
 const config = require("config");
 
-dotenv.config()
+
 connectDB()
 
 

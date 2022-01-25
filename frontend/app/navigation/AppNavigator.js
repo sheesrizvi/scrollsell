@@ -9,13 +9,14 @@ import NewListingButton from "./NewListingButton";
 import routes from "./routes";
 import SavePostScreen from "../screens/SavePostScreen";
 import CameraScreen from "../screens/CameraScreen";
+import CameraNavigator from "./CameraNavigator";
 
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Feed"
         component={FeedNavigator}
         options={{
@@ -23,14 +24,14 @@ const AppNavigator = () => {
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="ListingEdit"
-        component={ListingEditScreen}
+        name="CameraScreen"
+        component={CameraNavigator}
         options={({ navigation }) => ({
           tabBarButton: () => (
             <NewListingButton
-              onPress={() => navigation.navigate(routes.LISTING_EDIT)}
+              onPress={() => navigation.navigate(routes.CAMERA_SCREEN)}
             />
           ),
           tabBarIcon: ({ color, size }) => (
@@ -48,24 +49,6 @@ const AppNavigator = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="savePost"
-        component={SavePostScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="email" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="cameraScreen"
-        component={CameraScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="camera" color={color} size={size} />
           ),
         }}
       />

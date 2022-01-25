@@ -4,18 +4,18 @@ const listingsSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      // required: true,
       ref: "User",
     },
     title: {
       type: String,
       required: true,
     },
-    images: {
+    video: {
       type: String,
       required: true,
     },
-    category: {
+    categoryId: {
       type: String,
       required: true,
     },
@@ -24,8 +24,8 @@ const listingsSchema = mongoose.Schema(
       required: true,
     },
     location: {
-      type: { type: String, enum: ["Point"] },
-      coordinates: [Number],
+      type: { type: String, default: "Point" },
+      coordinates: {type: [Number], imdex: "2dsphere"},
     },
     price: {
       type: Number,
@@ -38,6 +38,6 @@ const listingsSchema = mongoose.Schema(
   }
 );
 
-const Listings = mongoose.model("Listings", listingsSchema)
+const Listing = mongoose.model("Listing", listingsSchema)
 
-module.exports = Listings;
+module.exports = Listing;
